@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تنزيل فيديوهات يوتيوب</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* نفس التصميم السابق مع بعض التعديلات */
+        /* ... (الكود السابق) ... */
+        
+        /* إضافة تحسينات للتحميل */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #ff4b2b;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 2s linear infinite;
+            display: none;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        #quality {
+            display: none;
+        }
+        
+        .quality-options {
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            display: none;
+        }
+        
+        .quality-option {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .quality-option:last-child {
+            border-bottom: none;
+        }
+        
+        .quality-option:hover {
+            background-color: #e9f7fe;
+        }
+        
+        .quality-option.selected {
+            background-color: #d1ecff;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <i class="fab fa-youtube logo"></i>
+            <h1>تنزيل فيديوهات يوتيوب</h1>
+            <p>أدخل رابط فيديو يوتيوب لتنزيله بجودة عالية</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="input-section">
+                <div class="input-group">
+                    <input type="text" id="videoUrl" placeholder="https://www.youtube.com/watch?v=..." autocomplete="off">
+                    <button id="fetchBtn">
+                        <i class="fas fa-search"></i> استخراج الفيديو
+                    </button>
+                </div>
+                
+                <div class="options">
+                    <div class="option-group">
+                        <label for="format">صيغة التنزيل:</label>
+                        <select id="format">
+                            <option value="mp4" selected>MP4 (فيديو)</option>
+                            <option value="mp3">MP3 (صوت فقط)</option>
+                        </select>
+                    </div>
+                    
+                    <div id="quality" class="option-group">
+                        <label>جودة الفيديو:</label>
+                        <div class="quality-options" id="qualityOptions"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="video-info" id="videoInfo">
+                <div class="video-preview">
+                    <div class="thumbnail">
+                        <img id="videoThumbnail" src="" alt="فيديو مصغر">
+                    </div>
+                    <div class="video-details">
+                        <h3 id="videoTitle">عنوان الفيديو</h3>
+                        <p id="videoDuration">المدة: --:--</p>
+                        <p id="videoChannel">القناة: ----</p>
+                        <p id="videoQuality">الجودة: ----</p>
+                    </div>
+                </div>
+                
+                <button id="downloadBtn" class="download-btn" disabled>
+                    <i class="fas fa-download"></i> تنزيل الفيديو
+                </button>
+                <div class="loader" id="loader"></div>
+            </div>
+            
+            <div class="features">
+                <div class="feature">
+                    <i class="fas fa-bolt"></i>
+                    <h3>سريع وسهل</h3>
+                    <p>تنزيل الفيديوهات بضغطة زر</p>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-highlighter"></i>
+                    <h3>بدون إعلانات</h3>
+                    <p>تجربة خالية من الإعلانات المزعجة</p>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-shield-alt"></i>
+                    <h3>آمن</h3>
+                    <p>لا نخزن أي بيانات شخصية</p>
+                </div>
+            </div>
+            
+            <div class="instructions">
+                <h3><i class="fas fa-info-circle"></i> كيفية الاستخدام:</h3>
+                <ol>
+                    <li>انسخ رابط فيديو يوتيوب من المتصفح</li>
+                    <li>الصق الرابط في الحقل بالأعلى</li>
+                    <li>اختر الجودة والصيغة المطلوبة</li>
+                    <li>انقر على "استخراج الفيديو"</li>
+                    <li>بعد ظهور معلومات الفيديو، انقر على "تنزيل الفيديو"</li>
+                </ol>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023 موقع تنزيل فيديوهات يوتيوب | هذا موقع تعليمي ولا ينتهك حقوق اليوتيوب</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const videoUrl = document.getElementById('videoUrl');
+            const fetchBtn = document.getElementById('fetchBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const videoInfo = document.getElementById('videoInfo');
+            const videoTitle = document.getElementById('videoTitle');
+            const videoDuration = document.getElementById('videoDuration');
+            const videoChannel = document.getElementById('videoChannel');
+            const videoThumbnail = document.getElementById('videoThumbnail');
+            const videoQuality = document.getElementById('videoQuality');
+            const formatSelect = document.getElementById('format');
+            const qualitySection = document.getElementById('quality');
+            const qualityOptions = document.getElementById('qualityOptions');
+            const loader = document.getElementById('loader');
+            
+            let videoData = null;
+            let selectedQuality = null;
+
+            // معالجة عملية استخراج معلومات الفيديو
+            fetchBtn.addEventListener('click', async function() {
+                const url = videoUrl.value.trim();
+                
+                if (!url) {
+                    alert('الرجاء إدخال رابط فيديو يوتيوب صحيح');
+                    return;
+                }
+                
+                // إظهار حالة التحميل
+                fetchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري المعالجة...';
+                fetchBtn.disabled = true;
+                
+                try {
+                    // إرسال طلب إلى الخادوم
+                    const response = await fetch('/get_video_info', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `url=${encodeURIComponent(url)}`
+                    });
+                    
+                    if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(error.error || 'حدث خطأ غير متوقع');
+                    }
+                    
+                    videoData = await response.json();
+                    
+                    // تحديث واجهة المستخدم بمعلومات الفيديو
+                    videoTitle.textContent = videoData.title;
+                    videoDuration.textContent = `المدة: ${videoData.duration}`;
+                    videoChannel.textContent = `القناة: ${videoData.channel}`;
+                    videoThumbnail.src = videoData.thumbnail;
+                    
+                    // إظهار قسم معلومات الفيديو
+                    videoInfo.classList.add('active');
+                    
+                    // إظهار خيارات الجودة إذا كان الفيديو
+                    if (formatSelect.value === 'mp4' && videoData.formats.length > 0) {
+                        qualitySection.style.display = 'block';
+                        qualityOptions.innerHTML = '';
+                        videoData.formats.forEach(format => {
+                            const option = document.createElement('div');
+                            option.className = 'quality-option';
+                            option.innerHTML = `
+                                <span>${format.resolution}</span>
+                                <span>${format.filesize}</span>
+                            `;
+                            option.dataset.itag = format.itag;
+                            option.dataset.resolution = format.resolution;
+                            
+                            option.addEventListener('click', function() {
+                                // إزالة التحديد من كل الخيارات
+                                document.querySelectorAll('.quality-option').forEach(opt => {
+                                    opt.classList.remove('selected');
+                                });
+                                
+                                // تحديد الخيار الحالي
+                                this.classList.add('selected');
+                                selectedQuality = format.itag;
+                                videoQuality.textContent = `الجودة: ${format.resolution}`;
+                            });
+                            
+                            // تحديد أول خيار افتراضياً
+                            if (!selectedQuality) {
+                                option.click();
+                            }
+                            
+                            qualityOptions.appendChild(option);
+                        });
+                        qualityOptions.style.display = 'block';
+                    } else {
+                        qualitySection.style.display = 'none';
+                        videoQuality.textContent = `الجودة: متوسطة`;
+                    }
+                    
+                    // تمكين زر التنزيل
+                    downloadBtn.disabled = false;
+                    
+                } catch (error) {
+                    alert(`حدث خطأ: ${error.message}`);
+                } finally {
+                    // إعادة تعيين زر الاستخراج
+                    fetchBtn.innerHTML = '<i class="fas fa-search"></i> استخراج الفيديو';
+                    fetchBtn.disabled = false;
+                }
+            });
+            
+            // عند تغيير صيغة التنزيل
+            formatSelect.addEventListener('change', function() {
+                if (videoInfo.classList.contains('active')) {
+                    if (this.value === 'mp4') {
+                        qualitySection.style.display = 'block';
+                        if (videoData && videoData.formats.length > 0) {
+                            qualityOptions.style.display = 'block';
+                        }
+                    } else {
+                        qualitySection.style.display = 'none';
+                        videoQuality.textContent = `الجودة: صوت فقط`;
+                    }
+                }
+            });
+            
+            // معالجة عملية التنزيل
+            downloadBtn.addEventListener('click', async function() {
+                const url = videoUrl.value.trim();
+                const format = formatSelect.value;
+                
+                if (!url || !videoData) {
+                    alert('الرجاء إدخال رابط فيديو يوتيوب صحيح أولاً واستخراج معلوماته');
+                    return;
+                }
+                
+                // إظهار حالة التنزيل
+                downloadBtn.style.display = 'none';
+                loader.style.display = 'block';
+                
+                try {
+                    // إرسال طلب التنزيل إلى الخادوم
+                    const formData = new FormData();
+                    formData.append('url', url);
+                    formData.append('format', format);
+                    
+                    if (format === 'mp4' && selectedQuality) {
+                        formData.append('itag', selectedQuality);
+                    }
+                    
+                    const response = await fetch('/download', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(error.error || 'حدث خطأ أثناء التنزيل');
+                    }
+                    
+                    // تحويل الاستجابة إلى Blob وإنشاء رابط تنزيل
+                    const blob = await response.blob();
+                    const downloadUrl = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = downloadUrl;
+                    a.download = `${cleanFilename(videoData.title)}.${format}`;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    
+                } catch (error) {
+                    alert(`حدث خطأ: ${error.message}`);
+                } finally {
+                    // إعادة تعيين زر التنزيل
+                    downloadBtn.style.display = 'block';
+                    loader.style.display = 'none';
+                }
+            });
+            
+            // السماح بالضغط على Enter في حقل الرابط
+            videoUrl.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    fetchBtn.click();
+                }
+            });
+            
+            // تنظيف اسم الملف
+            function cleanFilename(name) {
+                return name.replace(/[\\/*?:"<>|]/g, '');
+            }
+        });
+    </script>
+</body>
+</html>
